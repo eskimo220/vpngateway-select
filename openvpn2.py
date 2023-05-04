@@ -9,7 +9,7 @@ config_file_path = "./openvpn/config/vpngate_219.100.37.180_tcp_443.ovpn"
 openvpn_executable = "openvpn"  # 如果在系统PATH中，请使用 "openvpn"，否则请提供完整路径
 
 # 要测试的URL
-test_urls = ["https://www.example.com", "https://www.anotherexample.com"]
+test_urls = ["https://www.example.com"]
 
 # OpenVPN管理接口配置
 management_ip = "127.0.0.1"
