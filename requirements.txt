@@ -1,2 +1,2 @@
 requests>=2.25.1
-openvpn-api>=1.1.0
+openvpn-api>=0.1.0
