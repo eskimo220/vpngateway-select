@@ -7,7 +7,7 @@ import requests
 
 
 def download_csv_file(url, dir_name):
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     csvfile = os.path.join(dir_name, "vpn_servers.csv")
     with open(csvfile, "wb") as f:
         f.write(response.content)
@@ -25,19 +25,19 @@ def filter_and_sort_data(csvfile):
 
 
 def print_and_save_data(sorted_data, dir_name):
-    for row in sorted_data:
+    for idx, row in enumerate(sorted_data):
         truncated_row = [
             row[cell][:20] if len(row[cell]) > 20 else row[cell] for cell in row
         ]
         print(truncated_row)
-        ovpnfile = os.path.join(dir_name, row["#HostName"] + ".ovpn")
+        ovpnfile = os.path.join(dir_name, '{:>03d}'.format(idx) + "---" + row["IP"] + ".ovpn")
         row["ovpnfile"] = ovpnfile
         with open(ovpnfile, "wb") as file:
             file.write(base64.b64decode(row["OpenVPN_ConfigData_Base64"]))
 
 
 def dlcsv():
-    dir_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    dir_name = datetime.datetime.now().strftime("%Y%m%d")
 
     if os.path.exists(dir_name):
         shutil.rmtree(dir_name)

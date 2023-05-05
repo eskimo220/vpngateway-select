@@ -7,18 +7,20 @@ import os
 from openvpn_api import VPN
 
 # 配置OpenVPN
-config_file_path = "./20230504160455/public-vpn-48.ovpn"
+config_file_path = "./20230505045704/public-vpn-184.ovpn"
 openvpn_executable = "openvpn"  # 如果在系统PATH中，请使用 "openvpn"，否则请提供完整路径
 
 # 要测试的URL
-test_urls = ["https://chat.openai.com"]
+test_urls = ["https://www.google.com"]
 
 # OpenVPN管理接口配置
 management_ip = "127.0.0.1"
 management_port = 7505
 
+# 创建并存储进程对象
+processes = []
 
-def check_url_connectivity(urls=["https://chat.openai.com"]):
+def check_url_connectivity(urls=["https://www.google.com"]):
     for url in urls:
         try:
             response = requests.get(url, timeout=10)
@@ -36,7 +38,7 @@ def check_url_connectivity(urls=["https://chat.openai.com"]):
 def get_outbound_ip():
     ip_check_url = "https://api64.ipify.org"
     try:
-        response = requests.get(ip_check_url)
+        response = requests.get(ip_check_url,timeout=5)
         if response.status_code == 200:
             return response.text
         else:
@@ -92,6 +94,12 @@ def wait_for_vpn_connection2(management_ip, management_port, timeout=20):
     print("等待VPN连接超时")
     return False
 
+def stop_all_process():
+    for process in processes.copy():
+        process.terminate()
+        process.wait()  # 等待进程终止
+        processes.remove(process) 
+
 
 def connect_and_check(config_file_path):
     # 获取原始出站IP
@@ -110,11 +118,12 @@ def connect_and_check(config_file_path):
         ]
     )
 
+    processes.append(openvpn_process)
+
     # 等待VPN连接建立
     if not wait_for_vpn_connection(management_ip, management_port):
         print("无法建立VPN连接，终止程序")
-        openvpn_process.terminate()
-        openvpn_process.wait()
+        stop_all_process()
         return False
 
     # 获取VPN连接后的出站IP
@@ -122,14 +131,11 @@ def connect_and_check(config_file_path):
     print(f"VPN连接后的出站IP: {vpn_outbound_ip}")
 
     if vpn_outbound_ip == original_outbound_ip:
-        openvpn_process.terminate()
-        # os.kill(openvpn_process.pid, signal.SIGKILL)
-        openvpn_process.wait()
+        stop_all_process()
         return False
     # 测试连接和访问URL
     if not check_url_connectivity():
-        openvpn_process.terminate()
-        openvpn_process.wait()
+        stop_all_process()
         return False
 
     return True
@@ -168,6 +174,8 @@ def main():
     # 测试连接和访问URL
     check_url_connectivity(test_urls)
 
+
+    time.sleep(120)
     # 断开VPN连接
     openvpn_process.terminate()
 
