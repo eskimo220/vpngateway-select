@@ -21,3 +21,4 @@ jobs:
         with:
           push: true
           file: Dockerfile.alpine
+          tags: eskimo220/vpngateway-select:latest
