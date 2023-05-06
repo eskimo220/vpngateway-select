@@ -1,5 +1,5 @@
 from downloadCsv import dlcsv
-from openvpn2 import connect_and_check, check_url_connectivity, stop_all_process
+from openvpn import connect_and_check, check_url_connectivity, stop_all_process
 import time
 
 
