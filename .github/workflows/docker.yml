@@ -34,7 +34,7 @@ jobs:
       -
         name: Test
         run: |
-          docker run -it --rm -e TEST=YES --cap-add=NET_ADMIN --device=/dev/net/tun ${{ env.TEST_TAG }}
+          docker run --rm -e TEST=YES --cap-add=NET_ADMIN --device=/dev/net/tun ${{ env.TEST_TAG }}
     
       -
         name: Build and push
