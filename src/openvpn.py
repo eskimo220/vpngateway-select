@@ -20,8 +20,12 @@ logging.basicConfig(level=logging.INFO,
 
 def dns(domain_name="ifconfig.me"):
     """Retrieve the IP address of a given domain."""
-    ip_address = socket.gethostbyname(domain_name)
-    logging.info(f"The IP address of {domain_name} is {ip_address}")
+    try:
+        ip_address = socket.gethostbyname(domain_name)
+        logging.info(f"The IP address of {domain_name} is {ip_address}")
+    except:
+        logging.error(msg)(f"can not resolve {domain_name}")
+        pass
 
 def check_url_connectivity(urls=["https://www.google.com"]):
     """Check the connectivity to a list of URLs."""
