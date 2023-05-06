@@ -1,31 +1,74 @@
+import signal
+import logging
 from downloadCsv import dlcsv
 from openvpn import connect_and_check, check_url_connectivity, stop_all_process
 import time
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Set flag to indicate if program is running
+running = True
+
+def signal_handler(sig, frame):
+    """
+    Signal handler function to handle interruption signals
+    """
+    global running
+    logging.info("Program interrupted. Cleaning up...")
+    running = False
 
 def main():
+    """
+    The main function connects to each node and checks the VPN connectivity. If the VPN connectivity is established, the program enters an inner loop 
+    that checks the connectivity to a specific URL every minute. If the program detects that the URL connectivity is lost, 
+    it will restart the process from the beginning and try again. If the program cannot establish VPN connectivity for any node, it will exit with a failure status.
+    """
+    global running
 
-    while True:
-        nodes = dlcsv()
+    # Download list of nodes
+    nodes = dlcsv()
 
-        isOk = False
-        for node in nodes:
-            if connect_and_check(node["ovpnfile"]):
-                print("vpn is ok. wait 1 min to check again")
-                isOk = True
+    # Flag to indicate if VPN connectivity is established for any node
+    vpn_ok = False
+
+    # Connect to each node and check VPN connectivity
+    for node in nodes:
+        logging.info(f"Connecting to {node['ovpnfile']}")
+        if not running:
+            stop_all_process()
+            break
+        if connect_and_check(node["ovpnfile"]):
+            logging.info("VPN connectivity established.")
+            vpn_ok = True
+            break
+
+    # If VPN connectivity is established, wait for URL connectivity
+    if vpn_ok:
+        while running:
+            time.sleep(60)
+            if not running:
+                stop_all_process()
                 break
-
-        if isOk:
-            while True:
-                time.sleep(60)
-                if not check_url_connectivity():
-                    print("vpn is no longer ok. retry")
-                    stop_all_process()
-                    break
-        else:
-            print("something went wrong.")
-            return False
+            if not check_url_connectivity():
+                logging.info("URL connectivity lost. Retrying.")
+                stop_all_process()
+                break
+    else:
+        logging.error("VPN connectivity not established for any node.")
+        return False
 
 
 if __name__ == "__main__":
-    main()
+    # Start the program
+    logging.info("Program started.")
+    
+    # Register signal handler for interruption signals
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # Run the main loop
+    while running:
+        main()
+
+    # End the program
+    logging.info("Program ended.")

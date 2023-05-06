@@ -4,9 +4,15 @@ import shutil
 import datetime
 import csv
 import requests
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def download_csv_file(url, dir_name):
+    """Downloads a CSV file from the provided URL and saves it in the specified directory."""
     response = requests.get(url, timeout=10)
     csvfile = os.path.join(dir_name, "vpn_servers.csv")
     with open(csvfile, "wb") as f:
@@ -15,6 +21,7 @@ def download_csv_file(url, dir_name):
 
 
 def filter_and_sort_data(csvfile):
+    """Filters the data based on specific country codes and sorts the data based on scores."""
     with open(csvfile, "r", encoding="utf-8") as f:
         f.readline()
         csv_reader = csv.DictReader(f)
@@ -25,6 +32,7 @@ def filter_and_sort_data(csvfile):
 
 
 def print_and_save_data(sorted_data, dir_name):
+    """Prints the sorted data and saves it as individual .ovpn files."""
     for idx, row in enumerate(sorted_data):
         truncated_row = [
             row[cell][:20] if len(row[cell]) > 20 else row[cell] for cell in row
@@ -37,17 +45,25 @@ def print_and_save_data(sorted_data, dir_name):
 
 
 def dlcsv():
+    """Main function to download, filter, sort and save the data."""
     dir_name = datetime.datetime.now().strftime("%Y%m%d")
 
     if os.path.exists(dir_name):
         shutil.rmtree(dir_name)
+        logging.info(f"Removed existing directory: {dir_name}")
 
     os.makedirs(dir_name)
+    logging.info(f"Created new directory: {dir_name}")
 
     url = "http://www.vpngate.net/api/iphone/"
     csvfile = download_csv_file(url, dir_name)
+    logging.info(f"Downloaded CSV file: {csvfile}")
+
     sorted_data = filter_and_sort_data(csvfile)
+    logging.info("Filtered and sorted data")
+
     print_and_save_data(sorted_data, dir_name)
+    logging.info("Printed and saved data as .ovpn files")
 
     return sorted_data
 
