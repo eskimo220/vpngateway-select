@@ -38,7 +38,7 @@ def check_url_connectivity(urls=["https://www.google.com"]):
             return False
     return True
 
-def get_outbound_ip(ip_check_url="https://api64.ipify.org"):
+def get_outbound_ip(ip_check_url="https://ifconfig.me"):
     """Retrieve the outbound IP address."""
     try:
         dns(urlparse(ip_check_url).hostname)
