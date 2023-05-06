@@ -3,6 +3,7 @@ import requests
 import time
 import socket
 import logging
+import os
 from openvpn_api import VPN
 from urllib.parse import urlparse
 
@@ -113,16 +114,32 @@ def connect_and_check(config_file_path):
     """Connect to the VPN and check if the connection is successful."""
     original_outbound_ip = get_outbound_ip()
     logging.info(f"Original outbound IP: {original_outbound_ip}")
-    openvpn_process = subprocess.Popen(
-    [
+
+    options = [
         openvpn_executable,
         "--config",
         config_file_path,
         "--management",
         management_ip,
-        str(management_port),
+        str(management_port)
     ]
-)
+
+    if os.path.exists("/etc/openvpn/update-resolv-conf"):
+        options.extend([
+            "--up",
+        "/etc/openvpn/update-resolv-conf",
+        "--down",
+        "/etc/openvpn/update-resolv-conf"
+        ])
+    elif os.path.exists("/etc/openvpn/up.sh"):
+        options.extend([
+            "--up",
+        "/etc/openvpn/up.sh",
+        "--down",
+        "/etc/openvpn/down.sh"
+        ])
+
+    openvpn_process = subprocess.Popen(options)
 
     processes.append(openvpn_process)
 
@@ -143,27 +160,3 @@ def connect_and_check(config_file_path):
         return False
 
     return True
-
-def main():
-    original_outbound_ip = get_outbound_ip()
-    logging.info(f"Original outbound IP: {original_outbound_ip}")
-    openvpn_process = subprocess.Popen(
-        [        openvpn_executable,        "--config",        config_file_path,        "--management",        management_ip,        str(management_port),    ]
-    )
-
-    if not wait_for_vpn_connection2(management_ip, management_port):
-        logging.error("Cannot establish VPN connection, terminating program")
-        openvpn_process.terminate()
-        return
-
-    time.sleep(10)
-    vpn_outbound_ip = get_outbound_ip()
-    logging.info(f"Outbound IP after VPN connection: {vpn_outbound_ip}")
-
-    check_url_connectivity(test_urls)
-
-    time.sleep(120)
-    openvpn_process.terminate()
-
-if __name__ == "__main__":
-    dlcsv()
