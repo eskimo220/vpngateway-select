@@ -121,7 +121,9 @@ def connect_and_check(config_file_path):
         config_file_path,
         "--management",
         management_ip,
-        str(management_port)
+        str(management_port),
+        "--script-security",
+        "2"
     ]
 
     if os.path.exists("/etc/openvpn/update-resolv-conf"):
@@ -138,6 +140,9 @@ def connect_and_check(config_file_path):
         "--down",
         "/etc/openvpn/down.sh"
         ])
+    else:
+        logging.error("can not find dns shell.")
+        exit(1)
 
     openvpn_process = subprocess.Popen(options)
 
