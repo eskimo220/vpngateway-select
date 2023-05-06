@@ -45,7 +45,6 @@ def check_url_connectivity(urls=["https://www.google.com"]):
 
 def get_outbound_ip(ip_check_url="https://ifconfig.me"):
     """Retrieve the outbound IP address."""
-    time.sleep(2)
     try:
         dns(urlparse(ip_check_url).hostname)
         response = requests.get(ip_check_url, timeout=5)

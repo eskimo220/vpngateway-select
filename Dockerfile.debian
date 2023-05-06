@@ -1,7 +1,7 @@
 FROM python:3.9-slim-buster
 
 # 安装OpenVPN
-RUN apt-get update && apt-get install -y openvpn
+RUN apt-get update && apt-get install -y openvpn openresolv
 
 WORKDIR /app
 
