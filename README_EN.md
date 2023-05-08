@@ -18,7 +18,9 @@ The VPN Autoconnect Tool is designed to automatically connect to a VPN to solve 
 ```
 docker run --cap-add=NET_ADMIN --device=/dev/net/tun --name vpn-autoconnect vpn-autoconnect
 ```
-
+```
+docker run --cap-add=NET_ADMIN --device=/dev/net/tun --name vpn-autoconnect eskimo220/vpngateway-select
+```
 ### 2.3 Share the network with other docker containers
 
 docker-compose.yml

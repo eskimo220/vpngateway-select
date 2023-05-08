@@ -18,6 +18,11 @@
 ```
 docker run --cap-add=NET_ADMIN --device=/dev/net/tun --name vpn-autoconnect vpn-autoconnect
 ```
+- 使用做好的镜像：
+
+```
+docker run --cap-add=NET_ADMIN --device=/dev/net/tun --name vpn-autoconnect eskimo220/vpngateway-select
+```
 
 ### 2.3 把网络共享给其他docker container
 
