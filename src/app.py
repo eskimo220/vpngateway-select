@@ -4,11 +4,14 @@ from downloadCsv import dlcsv
 from openvpn import connect_and_check, check_url_connectivity, stop_all_process
 import time
 import os
+from pathlib import Path
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 is_test = os.getenv("TEST")
+okfile = Path('ok')
 
 # Set flag to indicate if program is running
 running = True
@@ -29,6 +32,8 @@ def main():
     """
     global running
 
+    okfile.unlink(missing_ok=True)
+
     # Download list of nodes
     nodes = dlcsv()
 
@@ -46,6 +51,7 @@ def main():
             break
         if connect_and_check(node["ovpnfile"]):
             logging.info("VPN connectivity established.")
+            okfile.touch()
             vpn_ok = True
             break
 
@@ -59,10 +65,12 @@ def main():
             time.sleep(60)
             if not running:
                 stop_all_process()
+                okfile.unlink(missing_ok=True)
                 break
             if not check_url_connectivity():
                 logging.info("URL connectivity lost. Retrying.")
                 stop_all_process()
+                okfile.unlink(missing_ok=True)
                 break
     else:
         logging.error("VPN connectivity not established for any node.")
