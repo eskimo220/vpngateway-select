@@ -4,7 +4,7 @@
 if [ "$TEST" = "YES" ]; then
   echo "Running in test mode"
   # 这里执行测试模式相关的命令
-  python /app/test_app.py
+  python app.py
 else
   echo "Running in normal mode"
 
