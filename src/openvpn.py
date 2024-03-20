@@ -55,7 +55,7 @@ def get_outbound_ip(ip_check_url="https://ifconfig.me"):
     except requests.exceptions.RequestException as e:
         logging.error(f"Error occurred while getting outbound IP: {e}")
 
-def wait_for_vpn_connection(management_ip, management_port, timeout=30):
+def wait_for_vpn_connection(management_ip, management_port, timeout=3000):
     """Wait for the VPN connection to be established."""
     start_time = time.time()
 
@@ -65,7 +65,16 @@ def wait_for_vpn_connection(management_ip, management_port, timeout=30):
                 (management_ip, management_port), timeout=2
             ) as sock:
                 sock.sendall(b"state\n")
-                response = sock.recv(4096).decode("utf-8")
+                
+                response = ""
+                # Continue reading from the socket until 'END' is found
+                while "END" not in response:
+                    part = sock.recv(4096).decode("utf-8")
+                    if not part:  # If no more data is received, break the loop
+                        break
+                    response += part
+                    
+                # Log the received response
                 logging.info(response)
 
             if "CONNECTED,SUCCESS" in response:
