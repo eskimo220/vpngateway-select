@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.9-alpine3.19
 
 # 安装OpenVPN
 RUN apk add --no-cache openvpn
@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ .
 
 HEALTHCHECK --interval=5s \
-            --timeout=1s \
-            --start-period=3s \
-            CMD test -e /app/ok || exit 1
+    --timeout=1s \
+    --start-period=3s \
+    CMD test -e /app/ok || exit 1
 
 CMD ["python", "app.py"]
