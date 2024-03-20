@@ -30,9 +30,12 @@ def dns(domain_name="ifconfig.me"):
 
 def check_url_connectivity(urls=["https://www.google.com"]):
     """Check the connectivity to a list of URLs."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
     for url in urls:
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 logging.info(f"Successfully accessed: {url}")
             else:
