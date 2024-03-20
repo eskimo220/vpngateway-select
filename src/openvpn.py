@@ -122,7 +122,9 @@ def connect_and_check(config_file_path):
         management_ip,
         str(management_port),
         "--script-security",
-        "2"
+        "2",
+        "--data-ciphers",
+        "AES-128-CBC:AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305"
     ]
 
     if os.path.exists("/etc/openvpn/update-resolv-conf"):
