@@ -36,7 +36,7 @@ def check_url_connectivity(urls=["https://www.google.com"]):
             if response.status_code == 200:
                 logging.info(f"Successfully accessed: {url}")
             else:
-                logging.error(f"Failed to access: {url}, status code: {response.status_code}")
+                logging.error(f"Failed to access: {url}, status code: {response.status_code}, response text: {response.text[:500]}")
                 return False
         except requests.exceptions.RequestException as e:
             logging.error(f"Error occurred while accessing URL: {e}")
@@ -73,7 +73,7 @@ def wait_for_vpn_connection(management_ip, management_port, timeout=3000):
                     if not part:  # If no more data is received, break the loop
                         break
                     response += part
-                    
+
                 # Log the received response
                 logging.info(response)
 
