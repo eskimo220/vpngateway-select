@@ -5,15 +5,24 @@ import datetime
 import csv
 import requests
 import logging
+from urllib3.util import Retry
+from requests.adapters import HTTPAdapter
 
 # Set up logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+session = requests.Session()
+   
+retries = Retry(total=5,
+                backoff_factor=1,
+                status_forcelist=[429, 500, 503])
+
+session.mount("https://", HTTPAdapter(max_retries=retries))
 
 def download_csv_file(url, dir_name):
     """Downloads a CSV file from the provided URL and saves it in the specified directory."""
-    response = requests.get(url, timeout=10)
+    response = session.get(url, timeout=10)
     csvfile = os.path.join(dir_name, "vpn_servers.csv")
     with open(csvfile, "wb") as f:
         f.write(response.content)
