@@ -35,7 +35,7 @@ def filter_and_sort_data(csvfile):
         f.readline()
         csv_reader = csv.DictReader(f)
         data = list(csv_reader)
-        data = [row for row in data if row["CountryShort"] in ["JP", "US"]]
+        data = [row for row in data if row["CountryShort"] in ["JP"] and not row["IP"].startswith("219.100.37") ]
         sorted_data = sorted(data, key=lambda x: int(x["Score"]), reverse=True)
     return sorted_data
 
